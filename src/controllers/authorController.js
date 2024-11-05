@@ -1,5 +1,6 @@
 const Authors = require("../models/authorModels");
 const { errorMsg, errorName } = require("../utils");
+const mongoose = require("mongoose");
 
 const AuthorController = {};
 
@@ -31,7 +32,7 @@ AuthorController.create = async (req, res, next) => {
 
 AuthorController.upload = async (req, res, next) => {
   try {
-    const { id, photo } = req.body; // Get id and photo from the body
+    const { id, photo } = req.body;
     if (!id || !photo) {
       throw {
         name: errorName.BAD_REQUEST,
@@ -40,7 +41,7 @@ AuthorController.upload = async (req, res, next) => {
     }
 
     const updatedAuthor = await Authors.findByIdAndUpdate(
-      id, // Use id from the request body
+      id,
       { $set: { photo, updatedAt: Date.now() } },
       { new: true }
     );
@@ -90,6 +91,15 @@ AuthorController.getById = async (req, res, next) => {
 AuthorController.putById = async (req, res, next) => {
   try {
     const { name, bio, photo } = req.body;
+    const authorId = req.params.id.trim();
+
+    if (!mongoose.isValidObjectId(authorId)) {
+      throw {
+        name: errorName.BAD_REQUEST,
+        message: errorMsg.INVALID_ID,
+      };
+    }
+
     if (!name) {
       throw {
         name: errorName.BAD_REQUEST,
@@ -98,8 +108,8 @@ AuthorController.putById = async (req, res, next) => {
     }
 
     const updatedAuthor = await Authors.findByIdAndUpdate(
-      req.params.id,
-      { $set: { name, bio, photo, updatedAt: Date.now() } },
+      authorId,
+      { $set: { name, bio, photo, updatedAt: new Date() } },
       { new: true }
     );
 
@@ -109,12 +119,12 @@ AuthorController.putById = async (req, res, next) => {
         message: errorMsg.AUTHOR_NOT_FOUND,
       };
     }
+
     res.status(200).json(updatedAuthor);
   } catch (error) {
     next(error);
   }
 };
-
 AuthorController.deleteById = async (req, res, next) => {
   try {
     const deletedAuthor = await Authors.findByIdAndDelete(req.params.id);

@@ -41,9 +41,9 @@ BooksController.create = async (req, res, next) => {
 
 BooksController.upload = async (req, res, next) => {
   try {
-    const { image } = req.body;
+    const { image, id } = req.body; // Ambil id dari body
 
-    if (!image) {
+    if (!image || !id) {
       throw {
         name: errorName.BAD_REQUEST,
         message: errorMsg.WRONG_INPUT,
@@ -51,7 +51,7 @@ BooksController.upload = async (req, res, next) => {
     }
 
     const uploadBook = await Books.findByIdAndUpdate(
-      req.params.id,
+      id,
       { $set: { image } },
       { new: true }
     );
@@ -62,6 +62,7 @@ BooksController.upload = async (req, res, next) => {
         message: errorMsg.BOOK_NOT_FOUND,
       };
     }
+
     res.status(200).json(uploadBook);
   } catch (error) {
     next(error);
@@ -87,7 +88,9 @@ BooksController.getAll = async (req, res, next) => {
 
 BooksController.getById = async (req, res, next) => {
   try {
-    const getBookId = await Books.findById(req.params.id);
+    const getBookId = await Books.findById(req.params.id)
+      .populate("authorId")
+      .populate("categories");
     if (!getBookId) {
       throw {
         name: errorName.NOT_FOUND,
@@ -143,7 +146,9 @@ BooksController.deleteById = async (req, res, next) => {
       req.params.id,
       { deletedAt: Date.now() },
       { new: true }
-    );
+    )
+      .populate("authorId")
+      .populate("categories");
 
     if (!deleteBook) {
       throw {
