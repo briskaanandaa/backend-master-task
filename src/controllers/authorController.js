@@ -31,8 +31,8 @@ AuthorController.create = async (req, res, next) => {
 
 AuthorController.upload = async (req, res, next) => {
   try {
-    const { photo } = req.body;
-    if (!photo) {
+    const { id, photo } = req.body; // Get id and photo from the body
+    if (!id || !photo) {
       throw {
         name: errorName.BAD_REQUEST,
         message: errorMsg.WRONG_INPUT,
@@ -40,7 +40,7 @@ AuthorController.upload = async (req, res, next) => {
     }
 
     const updatedAuthor = await Authors.findByIdAndUpdate(
-      req.params.id,
+      id, // Use id from the request body
       { $set: { photo, updatedAt: Date.now() } },
       { new: true }
     );

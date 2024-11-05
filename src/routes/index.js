@@ -22,7 +22,7 @@ routes.post("/author/", AuthorController.create);
 routes.put("/author/:id", AuthorController.putById);
 routes.get("/author/:id", AuthorController.getById);
 routes.delete("/author/:id", AuthorController.deleteById);
-routes.post("/author/upload/:id", AuthorController.upload);
+routes.post("/author/upload/", AuthorController.upload);
 
 // routes categories
 routes.get("/categories/", CategoriesController.getAll);
