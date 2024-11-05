@@ -93,7 +93,9 @@ BorrowerController.deleteById = async (req, res, next) => {
         message: errorMsg.BORROWER_NOT_FOUND,
       };
     }
-    res.status(200).json({ message: "Borrower deleted successfully" });
+    res
+      .status(200)
+      .json({ message: "Borrower deleted successfully", data: deleteBorrower });
   } catch (error) {
     next(error);
   }
